@@ -1,0 +1,43 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Prompt Pulse: Testing Standards
+
+**Purpose:** Defines the testing strategy and requirements for the Prompt Pulse project to ensure reliability and facilitate confident refactoring.
+
+**Note for AI Tools:** When generating new code or modifying existing logic, refer to these standards. Prioritize writing tests for critical paths and complex logic as outlined here.
+
+---
+
+## ✅ Testing Strategy (**Founder's Reliability Mandate**)
+
+Testing is crucial for a solo founder. It allows us to:
+
+1.  **Prevent Bugs:** Catch issues early before they impact users.
+2.  **Refactor Confidently:** Make changes to the codebase without fear of breaking existing functionality.
+3.  **Document Behavior:** Tests implicitly document how code is expected to behave.
+
+We will focus on a pragmatic testing approach:
+
+*   **Prioritize Critical Paths:** Test the core workflows (e.g., generating output, using integrations, signup, payment).
+*   **Focus on Units & Integrations:** Write unit tests for small, isolated logic and integration tests for interactions between components/services (especially backend <-> external API, backend <-> DB).
+*   **Pragmatism over Coverage %:** Aim for high test coverage on core business logic and integration points, rather than striving for 100% coverage everywhere initially.
+
+## 🧪 Testing Guidelines:
+
+*   **Unit Tests:**
+    *   **Guideline:** Test individual functions or components in isolation. Mock external dependencies (API calls, database interactions, external services).
+    *   **AI Rule:** When generating complex functions or React components with logic (e.g., hooks, utility functions, components with state/effects), also generate corresponding unit tests using the configured testing library (e.g., Jest, React Testing Library). Focus on testing different inputs and expected outputs/states.
+*   **Integration Tests:**
+    *   **Guideline:** Test the interaction between several units or services (e.g., a backend endpoint calling a database and an integration service, a React component interacting with a custom hook and an API).
+    *   **AI Rule:** When generating backend endpoints or frontend components that interact with APIs or multiple services, suggest or generate integration tests. These tests should mock external services (like LLMs, Integration APIs, Payment Gateway) but test the flow of data and logic within our system.
+*   **End-to-End (E2E) Tests:**
+    *   **Guideline:** Test the full user flow through the application (e.g., user signup -> connect integration -> generate output -> save output -> upgrade). Use tools like Cypress or Playwright.
+    *   **AI Rule:** E2E tests are generally too broad for AI to generate automatically for specific code changes. When implementing critical user flows (e.g., Step 1.5 Signup, Step 3.7 Apply, Phase 8 Billing), **remind the developer/AI** that E2E tests should be written manually for these flows later (Phase 9).
+*   **Test Structure:**
+    *   **Guideline:** Organize tests logically (e.g., `__tests__` directories next to the code, descriptive file names). Follow standard test structure (`describe`, `it`/`test`, `expect`).
+    *   **AI Rule:** Generate test files in the appropriate location (`__tests__` directory). Use clear `describe` and `it` blocks describing the functionality being tested.
+
+---

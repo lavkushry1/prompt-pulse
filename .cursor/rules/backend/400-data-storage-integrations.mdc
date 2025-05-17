@@ -1,0 +1,63 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Prompt Pulse: Backend (Data, Integrations, AI, Payments) Standards
+
+**Purpose:** Defines specific coding standards and patterns for backend components interacting with databases, external integrations, AI models, payment gateways, and caching.
+
+**Note for AI Tools:** Apply these rules when working on code that interacts with the database, calls external APIs (Integrations, LLM), handles payment webhooks, or uses caching/vector databases. Refer to the "Tech Stack," "Dev Task Backbone," and "LLM Juice Strategy" documents.
+
+---
+
+## 💾 Database Interaction
+
+*   **Guideline:** Interact with the database using clear, maintainable code.
+*   **AI Rule:**
+    *   Use the Supabase SDK or a chosen ORM/query builder consistently for database operations.
+    *   Write clear, performant SQL queries (or ORM equivalents). Avoid N+1 query issues where possible (e.g., eager loading).
+    *   Implement **transactionality** for database operations that involve multiple steps that must succeed or fail together (e.g., creating a user and their initial settings).
+    *   Adhere strictly to the defined database schema and RLS policies.
+
+## 🔗 Integration Service Layer (**CRITICAL & Complex**)
+
+*   **Guideline:** Abstract external API calls into dedicated service modules per integrated tool. Handle external API specifics (auth, rate limits, errors) within these modules.
+*   **AI Rule:**
+    *   Create separate service files/directories for each integrated tool (e.g., `services/integrations/hubspot.ts`).
+    *   Implement functions within these services for specific actions (e.g., `hubspot.getContact(id)`, `hubspot.createDraftEmail(...)`). These functions should handle making the HTTP request to the external API using the stored, refreshed token.
+    *   Implement **robust error handling** for external API calls (check response status codes, parse error bodies). Log external API errors with sufficient context.
+    *   Implement **retry logic** for idempotent API calls that might fail due to transient errors (e.g., network issues, rate limits).
+    *   **Do not expose external API call logic or credential handling directly in API endpoints.** Endpoints should call functions from the integration service modules.
+
+## 🤖 AI / LLM Interaction (**Cost, Perf, Reliability Focus**)
+
+*   **Guideline:** Manage LLM interactions efficiently, cost-effectively, and reliably. Implement the "LLM Juice Strategy."
+*   **AI Rule:**
+    *   Use the LLM provider SDKs.
+    *   Implement logic to **dynamically select the LLM model** based on the user's plan and the complexity/type of the specific niche task (`000-project-standards.mdc` for KISS/Modularity, `Tech Stack` for model options, `LLM Juice Strategy` for routing logic). Use cheaper models where quality is sufficient.
+    *   Set `max_tokens` appropriately for the expected output of the niche task to control cost.
+    *   Implement calls to the **Vector DB** (RAG) service *before* calling the LLM for tasks that benefit from external knowledge (niche best practices, user history), embedding the relevant retrieved chunks into the LLM prompt.
+    *   Implement calls to the **Caching** service to check for a cached response *before* calling the LLM API for repeatable requests.
+    *   Ensure **all LLM API calls are logged** via the configured LLM monitoring tool (Helicone/LangSmith), including input, output, model used, tokens, and cost, linked to the user ID and feature used. This is critical for cost control (`Observability` in `000-project-standards.mdc`).
+    *   Implement error handling specifically for LLM API errors.
+
+## ⚡ Caching Implementation
+
+*   **Guideline:** Cache expensive or frequent results (LLM calls, complex DB queries).
+*   **AI Rule:**
+    *   Implement functions to get/set data in the configured caching service (Redis/Supabase Cache).
+    *   Identify opportunities to cache LLM responses, especially for common input patterns or templates, using a hash of the input/context as the cache key.
+    *   Implement a basic cache invalidation strategy (e.g., time-based expiry).
+
+## 💸 Payment Gateway Webhooks (**CRITICAL Security & Reliability**)
+
+*   **Guideline:** Handle payment webhook events securely and reliably to update user subscription status.
+*   **AI Rule:**
+    *   Implement the webhook endpoint (`/api/webhooks/stripe` or similar).
+    *   **CRITICAL:** Implement **webhook signature verification** using the payment gateway's SDK to ensure the request is legitimate. Return 400 or 401 if verification fails.
+    *   Process webhook events atomically. Use database transactions if updating multiple related tables.
+    *   Implement **retry logic** on our side for processing webhooks if external dependencies (like database) are temporarily unavailable. Payment gateways usually retry sending, but our processing must be robust.
+    *   Log all received webhook events and the outcome of processing them (`Observability`).
+
+---

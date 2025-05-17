@@ -1,0 +1,27 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Prompt Pulse: Internal Documentation Standards
+
+**Purpose:** Defines requirements for code-level documentation to ensure the codebase remains understandable and maintainable over time for a solo developer.
+
+**Note for AI Tools:** When generating code, follow these standards for adding comments and documentation.
+
+---
+
+## 📝 Code-Level Documentation
+
+*   **Guideline:** Add comments and documentation where the *why* or *how* is not immediately obvious from the code itself.
+*   **AI Rule:**
+    *   **Function/Component Purpose:** For any function, class, or significant React component (especially those used in multiple places or performing complex logic), generate a brief JSDoc or TSdoc comment explaining its purpose, parameters, and return value.
+    *   **Non-Obvious Logic:** Add inline comments to explain complex algorithms, workarounds, or decisions that deviate from standard practices.
+    *   **Integration Specifics:** For code interacting with external APIs (especially content scripts or integration backend modules), add comments explaining specific API requirements, known quirks, or DOM selectors being used and why.
+
+## 📂 Module/Directory Documentation
+
+*   **Guideline:** Briefly explain the purpose of directories or core modules.
+*   **AI Rule:** When creating a new directory for a significant module (e.g., `services/integrations/hubspot`, `components/workflows/coldEmail`), suggest creating a brief `README.md` file in that directory explaining its purpose and the main files it contains.
+
+---

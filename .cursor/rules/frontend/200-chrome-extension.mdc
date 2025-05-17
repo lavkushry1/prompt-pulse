@@ -1,0 +1,56 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Prompt Pulse: Frontend (Chrome Extension) Standards
+
+**Purpose:** Defines specific coding standards and architecture for the Chrome Extension, addressing its unique browser environment and integration goals.
+
+**Note for AI Tools:** Apply these rules when working on code within the `extension/` directory (or similar) that is part of the Chrome Extension build. Refer to the "Tech Stack" and "Dev Task Backbone" for details on the specific integration targets and tasks.
+
+---
+
+## 🏗️ Extension Architecture
+
+*   **Guideline:** Follow the Manifest V3 architecture with clear separation of concerns.
+*   **AI Rule:**
+    *   Implement background logic in a **service worker** (`background.js`). Handle events, manage state that needs persistence across browser sessions, and make backend API calls from here. Avoid complex DOM interaction here.
+    *   Implement popup UI in a dedicated HTML/JS file (`popup.html`/`popup.js`). Keep popup logic minimal; delegate heavy tasks to the service worker via message passing. Popup should open and close quickly.
+    *   Implement website interaction logic in **content scripts** (`content.js`). These scripts run in the context of the visited page. They can access/modify the page's DOM but have limited access to Chrome APIs and *cannot* directly access backend secrets or user data not present on the page.
+
+## 📨 Message Passing
+
+*   **Guideline:** Communication between different parts of the extension (popup, background, content scripts) and the web app must use Chrome's Message Passing API.
+*   **AI Rule:**
+    *   Use `chrome.runtime.sendMessage` or `chrome.tabs.sendMessage` to send messages.
+    *   Use `chrome.runtime.onMessage` to listen for messages.
+    *   Define clear, structured message formats (e.g., `{ type: 'GET_CONTEXT', payload: { ... } }`).
+    *   Implement basic request/response patterns for message exchanges.
+
+## 💉 Content Script Interaction (**CRITICAL & Fragile**)
+
+*   **Guideline:** Content scripts interact directly with external websites, which are prone to change. Code must be targeted, defensive, and minimal.
+*   **AI Rule:**
+    *   Minimize the amount of code running in `content.js`. Focus *only* on detecting page context, extracting data, and injecting output.
+    *   When selecting DOM elements, use the most stable selectors possible (e.g., IDs > specific data attributes > class names > tag names). Add comments explaining *which* element is being targeted and *why*.
+    *   **Implement null/undefined checks** before interacting with DOM elements selected by queries (`querySelector` can return null). Handle cases where the expected elements are not found gracefully (log a warning, don't crash).
+    *   **Logging:** Implement **robust error logging specifically within content scripts** using the configured error monitoring service. Content scripts are the most likely place for unexpected errors due to external website changes. Include URL and selector information in logs.
+    *   When injecting output, identify the correct target input field. Attempt to programmatically set its `value` and trigger common events (`input`, `change`, `blur`) to ensure the target website's own JavaScript recognizes the change.
+
+## 🔐 Authentication Sync
+
+*   **Guideline:** Sync authentication status from the web app to the extension securely.
+*   **AI Rule:**
+    *   Store user authentication status (e.g., `isLoggedIn`, `role`) and token (if necessary for backend calls from background script) in `chrome.storage.local`.
+    *   Ensure sensitive data (like full API keys or highly sensitive tokens) is **NEVER** stored directly in `chrome.storage` or exposed in the extension's frontend code. Token should be backend-only if possible.
+    *   Implement logic in the web app to update `chrome.storage.local` upon login/logout. Implement logic in the extension (service worker/popup) to read from `chrome.storage.local` to determine the user's state.
+
+## ⚡ Performance
+
+*   **Guideline:** Extension popup must open and load quickly. Content scripts should not impact page performance.
+*   **AI Rule:**
+    *   Avoid computationally heavy tasks or large data fetching directly in the popup script. Delegate these to the background script or backend.
+    *   Content scripts should execute quickly upon injection. Avoid long-running loops or blocking operations.
+
+---

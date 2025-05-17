@@ -1,0 +1,69 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Prompt Pulse: Project-Wide Code Standards
+
+**Purpose:** This document defines the fundamental coding principles and standards that apply across *all* parts of the Prompt Pulse project (frontend, backend, database, extension). It is the highest-level rulebook.
+
+**Note for AI Tools:** Read this first. These are the overarching principles and non-negotiable requirements for all code generated or modified in this project. When working on *any* task, ensure adherence to DRY, KISS, Modularity, Security, and Observability as defined here.
+
+---
+
+## 👔 The Strategic Importance of Code Quality (**Founder's Mandate**)
+
+As a solo founder building a high-value SaaS, our code quality is directly tied to our ability to succeed:
+
+1.  **Agility:** High-quality code allows faster feature development and pivots.
+2.  **Maintainability:** Simple, modular code is easier for *us* to understand and fix.
+3.  **Reliability:** Good practices reduce bugs, increasing user trust.
+4.  **Sustainability:** Avoids technical debt that cripples solo operations.
+
+**Code quality is our competitive advantage and operational necessity.**
+
+## 🛠️ Core Coding Principles:
+
+Apply these *everywhere*:
+
+### 1. DRY (Don't Repeat Yourself)
+
+*   **Guideline:** Every piece of logic or configuration should have a single source of truth.
+*   **AI Rule:** Before writing new code, check for existing functions, components, types, or constants that handle similar logic or data structures. **Prioritize reusing existing code.** If a piece of logic is repeated more than twice, suggest extracting it into a reusable function or module.
+
+### 2. KISS (Keep It Simple, Stupid)
+
+*   **Guideline:** Favor the simplest possible implementation that meets the requirements. Avoid premature optimization, complex abstractions, or clever code that is hard to read.
+*   **AI Rule:** When generating code, choose the most straightforward approach that solves the immediate problem. Break down complex tasks into smaller, easy-to-understand steps. Do not add complexity for hypothetical future needs unless explicitly instructed.
+
+### 3. Modularity
+
+*   **Guideline:** Break down code into small, independent units (functions, components, modules) with single responsibilities and clear interfaces. Group related units logically (e.g., in directories like `utils/`, `components/`, `services/`).
+*   **AI Rule:** Generate code in small, focused units. Do not create large, monolithic functions or components. Place generated code in the appropriate directory based on its responsibility (frontend/backend, component/service/utility). Ensure minimal coupling between units.
+
+## 🔒 Security Standards (**Founder's Non-Negotiable**)
+
+*   **Guideline:** Security is paramount. Assume all external input (user input, API responses, webhook payloads) is malicious until validated. Never expose secrets.
+*   **AI Rule:**
+    *   **Secrets:** **NEVER** hardcode API keys, database credentials, or sensitive configuration. Use environment variables (`process.env.VARIABLE_NAME`). Ensure environment variables are accessed *only* on the backend (except for necessary public keys like Stripe publishable key).
+    *   **Validation:** Implement **input validation** on *all* backend endpoints that receive data from the frontend or external services (webhooks, integration callbacks). Validate data types, formats, and constraints. Use libraries like Zod or Joi.
+    *   **Authentication/Authorization:** On *every* backend endpoint that accesses user data or performs privileged actions, verify the user's authentication status and check their role/permissions.
+    *   **Integration Credentials:** When handling integration access/refresh tokens, generate code for **encrypted storage** in the database. Never log sensitive credential information.
+    *   **Frontend Security:** Do not store sensitive user data or secrets in frontend code or local storage. Assume frontend code can be inspected.
+
+## 📊 Observability Standards (**Founder's Essential for Solo Ops**)
+
+*   **Guideline:** We need to know what's happening in production to quickly identify and fix issues.
+*   **AI Rule:**
+    *   **Logging:** Implement structured logging for key events (user signup, integration connection, LLM call, payment webhook received, errors). Include relevant context (user ID, request ID, error message, stack trace). Use a consistent logging format.
+    *   **Error Reporting:** Integrate and use the configured error monitoring service (Sentry/LogRocket). Ensure uncaught exceptions and significant errors are reported with context.
+    *   **Metrics:** Log or track key operational metrics (LLM tokens used, LLM latency, integration API call success/failure, request duration) via the configured monitoring tools (Helicone/LangSmith/Google Cloud Monitoring).
+
+## ⚙️ General Development Standards:
+
+*   **Language:** Use TypeScript for all new code. Define types and interfaces.
+*   **Formatting & Linting:** Adhere strictly to project ESLint and Prettier rules.
+*   **Naming:** Use clear, descriptive names for variables, functions, components, and modules. Follow standard conventions (e.g., camelCase for JS/TS, PascalCase for React components, snake_case for database columns).
+*   **Comments:** Add comments to explain *why* code exists or *why* a non-obvious approach was taken. Avoid commenting *what* the code does if it's self-explanatory.
+
+---

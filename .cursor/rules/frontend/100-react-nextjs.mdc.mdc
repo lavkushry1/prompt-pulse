@@ -1,0 +1,55 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Prompt Pulse: Frontend (React/Next.js) Standards
+
+**Purpose:** Defines specific coding standards and patterns for the React/Next.js frontend application, aligning with project-wide principles.
+
+**Note for AI Tools:** Apply these rules when working on code within the `pages/`, `components/`, `hooks/`, `utils/` directories (and similar) of the frontend application. Prioritize based on the "Dev Task Backbone" and "UI/UX Design Guide". Always remember the Niche Focus.
+
+---
+
+## ✨ React Component Design
+
+*   **Guideline:** Components should be functional components using Hooks. They should generally follow the Single Responsibility Principle (one component, one job).
+*   **AI Rule:**
+    *   Create functional components using arrow function syntax (`const MyComponent = () => { ... }`).
+    *   Use React Hooks (`useState`, `useEffect`, `useContext`, etc.) for managing state and side effects.
+    *   Ensure components have clear, explicit props with TypeScript interfaces for type checking. Avoid prop drilling; use Context for widely needed data (e.g., user info, settings).
+    *   Components should render UI or manage state for a specific part of the interface, not mix unrelated logic.
+
+## 🧩 State Management
+
+*   **Guideline:** Use the simplest state management solution appropriate for the scope.
+*   **AI Rule:**
+    *   For local component state, use `useState` or `useReducer`.
+    *   For simple global state needed by several components, use `useContext` combined with `useState`/`useReducer`.
+    *   For complex application-wide state (e.g., user session details, application settings loaded on startup, state that needs to be accessed by many disparate components), suggest using the configured state management library (Zustand/Redux Toolkit).
+    *   Store sensitive state (like authentication tokens) securely on the **backend** or in secure browser storage (like `chrome.storage.local` for extension sync), *not* in global frontend state accessible to arbitrary components.
+
+## 🧱 Next.js Patterns
+
+*   **Guideline:** Use Next.js features (Routing, API Routes) effectively.
+*   **AI Rule:**
+    *   Implement pages within the `pages/` directory for file-system routing.
+    *   Implement backend endpoints that are specific to the frontend's needs (e.g., simple data fetching, triggering backend processes) within `pages/api/` (Serverless Functions). For core backend services (integrations, heavy LLM logic), call dedicated backend service endpoints if they exist separately.
+    *   Use `getServerSideProps` or `getStaticProps` where appropriate for data fetching on pages (consider performance/SEO needs vs. simplicity of client-side fetching).
+
+## 🎨 Styling
+
+*   **Guideline:** Use Tailwind CSS utilities for styling.
+*   **AI Rule:**
+    *   Apply styles directly using Tailwind utility classes within JSX `className` attributes.
+    *   Avoid creating separate CSS modules (`.module.css`) or traditional CSS files unless implementing complex custom styles or animations not easily achievable with Tailwind.
+    *   Adhere to the configured Tailwind theme (colors, fonts).
+
+## 📡 API Interactions
+
+*   **Guideline:** Abstract API calls and handle loading/error states gracefully in the UI.
+*   **AI Rule:**
+    *   Create utility functions or hooks (e.g., `useFetch`, `api.js`) for making backend API calls (`fetch` or `axios`).
+    *   In components, manage loading (`isLoading`) and error (`isError`, `error`) states when fetching data. Display loading indicators or error messages to the user.
+
+---

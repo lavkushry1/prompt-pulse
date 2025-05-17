@@ -1,0 +1,55 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Prompt Pulse: Backend (Node.js/Serverless) Standards
+
+**Purpose:** Defines specific coding standards and patterns for the Node.js backend, whether using Express or Serverless Functions, focusing on API design, error handling, and security.
+
+**Note for AI Tools:** Apply these rules when working on code within the `backend/` directory (or similar) that handles server-side logic, API endpoints, and interacts with databases or external services. Refer to the "Dev Task Backbone" and "Tech Stack" for task specifics and service details.
+
+---
+
+## 🏗️ Serverless Function Design (if applicable)
+
+*   **Guideline:** Write stateless functions that handle a single request/event.
+*   **AI Rule:**
+    *   Ensure functions do not rely on process memory between invocations (e.g., avoid storing user-specific state in global variables).
+    *   Manage dependencies efficiently to minimize cold start times (though less critical for Node.js service workers/Cloud Run instances).
+
+## 🏛️ API Endpoint Design
+
+*   **Guideline:** Design RESTful-ish APIs with clear, intention-revealing endpoints and methods.
+*   **AI Rule:**
+    *   Use meaningful endpoint paths (e.g., `/api/nicheOutputs`, `/api/integrations/hubspot/context`).
+    *   Use appropriate HTTP methods (GET for fetching, POST for creating, PUT/PATCH for updating, DELETE for deleting).
+    *   Return standard HTTP status codes (200 OK, 201 Created, 400 Bad Request, 401 Unauthorized, 403 Forbidden, 404 Not Found, 429 Too Many Requests, 500 Internal Server Error).
+
+## ✋ Error Handling (**CRITICAL for Reliability**)
+
+*   **Guideline:** Implement centralized, robust error handling. Catch errors, log them with context, and return meaningful but non-verbose error responses to the frontend.
+*   **AI Rule:**
+    *   Use `try...catch` blocks for asynchronous operations that might fail (API calls, database operations).
+    *   Implement a centralized error handling middleware or function to process errors consistently.
+    *   Log the full error details (message, stack trace, user ID if available, request details) using the configured logging service.
+    *   Return generic error messages to the frontend for 5xx errors ("An unexpected error occurred"), but specific, actionable error messages for 4xx errors (e.g., "Invalid input data", "Limit reached"). **NEVER** expose internal error details or stack traces to the frontend.
+
+## ⏳ Asynchronous Operations
+
+*   **Guideline:** Use `async/await` for clear handling of promises (API calls, database queries, file operations).
+*   **AI Rule:** Always use `async/await` when dealing with asynchronous operations. Avoid chaining `.then().catch()` unless specifically required for complex flows.
+
+## ✅ Input Validation
+
+*   **Guideline:** Validate *all* incoming request data on the backend before processing it.
+*   **AI Rule:**
+    *   For any endpoint receiving data (POST, PUT, PATCH), use a validation library (Zod, Joi, Yup) to define expected schema and validate the request body/query parameters.
+    *   Return a 400 Bad Request response with specific validation errors if validation fails.
+
+## 🔒 Security Checks
+
+*   **Guideline:** Every endpoint that requires authentication or specific permissions must enforce it.
+*   **AI Rule:** At the beginning of any protected endpoint function, add code to verify the user's authentication token/session and check their role using the Auth service SDK. Return 401 (Unauthorized) or 403 (Forbidden) if checks fail.
+
+---

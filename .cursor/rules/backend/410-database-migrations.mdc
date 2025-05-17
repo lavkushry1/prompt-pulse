@@ -1,0 +1,28 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Prompt Pulse: Backend (Database Migrations) Standards
+
+**Purpose:** Defines the process for managing database schema changes in a structured and repeatable way.
+
+**Note for AI Tools:** When changes to the database schema are required as part of a task, refer to this document for the process.
+
+---
+
+## 🔄 Schema Evolution Management
+
+*   **Guideline:** All changes to the database schema (creating tables, adding/removing columns, altering types, adding indexes) must be managed using a database migration tool.
+*   **AI Rule:**
+    *   Do NOT generate raw SQL statements to modify the database schema directly within application code (e.g., `CREATE TABLE` or `ALTER TABLE` inside an API endpoint).
+    *   When a task requires a schema change, **remind the developer/AI** that a new database migration script needs to be generated and executed using the configured migration tool (e.g., Supabase Migrations, Flyway, Knex).
+    *   If the task involves modifying a schema used by application code, **generate or suggest generating the corresponding migration script** as the primary output for this part of the task, rather than just modifying the application code that uses the schema.
+    *   Ensure migration scripts include both 'up' (apply change) and 'down' (revert change) steps where possible.
+
+## 🔒 Migration Safety
+
+*   **Guideline:** Migrations should be designed to minimize downtime and data loss risk.
+*   **AI Rule:** When generating migration scripts, favor additive changes (adding columns/tables) over destructive changes (removing/altering columns in place). If destructive changes are necessary, note potential risks or suggest manual review.
+
+---

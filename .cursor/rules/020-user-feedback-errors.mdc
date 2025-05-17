@@ -1,0 +1,40 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Prompt Pulse: User-Facing Feedback & Error Messaging
+
+**Purpose:** Defines standards for communicating status, success, and errors to the user, ensuring a clear and helpful experience.
+
+**Note for AI Tools:** When implementing user-facing features, particularly those involving asynchronous operations or potential errors, refer to these standards for how to communicate with the user.
+
+---
+
+## 🗣️ Communication Principles
+
+*   **Guideline:** User communication should be clear, concise, and empathetic.
+*   **AI Rule:** Use simple, direct language. Avoid technical jargon in user-facing messages.
+
+## 🔄 Status Indicators
+
+*   **Guideline:** Provide clear feedback when an action is in progress.
+*   **AI Rule:** When implementing actions that involve asynchronous operations (API calls, LLM generation, integration actions), generate code to show:
+    *   **Loading states:** Disable buttons, display spinners or skeleton loaders.
+    *   **Progress (optional):** If an operation has distinct steps, show progress indicators.
+
+## ✅ Success Messages
+
+*   **Guideline:** Confirm to the user when an action has successfully completed.
+*   **AI Rule:** Use non-intrusive methods like **toast notifications** for confirming successful actions (e.g., "Output Saved!", "Integration Connected!"). Keep messages brief and clear.
+
+## ❌ Error Handling (User-Facing)
+
+*   **Guideline:** Inform the user when an error occurs, explain *what* went wrong (if possible in user terms), and suggest a next step if applicable. Never show raw technical error details.
+*   **AI Rule:**
+    *   Translate technical backend errors into user-friendly messages on the frontend. For generic 5xx errors, a simple "An unexpected error occurred. Please try again later." is sufficient.
+    *   For specific 4xx errors (e.g., validation failed, limit reached, integration error), display a message that explains the specific issue (e.g., "Invalid email format," "You've reached your free generation limit," "Error connecting to [Tool Name]. Please check your credentials.") (`backend/300-node-serverless.mdc` for backend error handling).
+    *   Use toast notifications or inline error messages near the relevant UI element for non-blocking errors. Use modals for critical, blocking errors.
+    *   Include a way for the user to report the error if they encounter a persistent or unclear issue (e.g., "If this problem continues, contact support.").
+
+---
